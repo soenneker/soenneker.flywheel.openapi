@@ -9,27 +9,38 @@
     "/flywheel/user": {
       "get": {
         "tags": [
-          "FlywheelAuthentication"
+          "Flywheel authentication"
         ],
         "summary": "Returns the authenticated dashboard user.",
+        "description": "Returns the username associated with the authenticated dashboard cookie.",
         "operationId": "FlywheelAuthentication_GetUser",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/DashboardUser"
-                }
-              },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DashboardUser"
                 }
-              },
-              "text/json": {
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DashboardUser"
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -40,25 +51,16 @@
     "/flywheel/csrf": {
       "get": {
         "tags": [
-          "FlywheelAuthentication"
+          "Flywheel authentication"
         ],
         "summary": "Issues an antiforgery token for the current dashboard identity.",
+        "description": "Available anonymously. Issues an antiforgery cookie and request token for the current dashboard identity. Use the request token for dashboard POST requests.",
         "operationId": "FlywheelAuthentication_GetCsrf",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Csrf"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Csrf"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Csrf"
                 }
@@ -72,9 +74,10 @@
     "/flywheel/login": {
       "post": {
         "tags": [
-          "FlywheelAuthentication"
+          "Flywheel authentication"
         ],
         "summary": "Verifies credentials and issues the secure dashboard cookie.",
+        "description": "Accepts dashboard credentials and issues an authentication cookie. Requires an antiforgery token. Invalid credentials return 401; exceeding the login rate limit returns 429.",
         "operationId": "FlywheelAuthentication_Login",
         "parameters": [
           {
@@ -94,11 +97,6 @@
                 "$ref": "#/components/schemas/LoginRequest"
               }
             },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            },
             "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/LoginRequest"
@@ -109,7 +107,50 @@
         },
         "responses": {
           "204": {
-            "description": "No Content"
+            "description": "No Content",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [ ]
@@ -118,9 +159,10 @@
     "/flywheel/logout": {
       "post": {
         "tags": [
-          "FlywheelAuthentication"
+          "Flywheel authentication"
         ],
         "summary": "Removes the current dashboard authentication cookie.",
+        "description": "Removes the dashboard authentication cookie. Requires an authenticated dashboard user and an antiforgery token.",
         "operationId": "FlywheelAuthentication_Logout",
         "parameters": [
           {
@@ -135,7 +177,40 @@
         ],
         "responses": {
           "204": {
-            "description": "No Content"
+            "description": "No Content",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -143,9 +218,10 @@
     "/flywheel/jobs/schedules/{id}/run": {
       "post": {
         "tags": [
-          "FlywheelJobs"
+          "Flywheel jobs"
         ],
         "summary": "Queues an immediate execution without changing the recurring schedule.",
+        "description": "Requires a recurring schedule and store support for manual execution.",
         "operationId": "FlywheelJobs_RunRecurring",
         "parameters": [
           {
@@ -167,24 +243,60 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/StartedJob"
-                }
-              },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StartedJob"
                 }
-              },
-              "text/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StartedJob"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Not Implemented",
+            "content": {
+              "application/json": { }
             }
           }
         }
@@ -193,9 +305,10 @@
     "/flywheel/jobs/history": {
       "get": {
         "tags": [
-          "FlywheelJobs"
+          "Flywheel jobs"
         ],
         "summary": "Returns durable activity across all jobs for a requested UTC range.",
+        "description": "Defaults to the last day within retention. Start must precede end and remain within retention; end may be at most five minutes in the future.",
         "operationId": "FlywheelJobs_History",
         "parameters": [
           {
@@ -216,26 +329,30 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/JobHistoryPoint"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/JobHistoryPoint"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -244,6 +361,22 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Not Implemented",
+            "content": {
+              "application/json": { }
+            }
           }
         }
       }
@@ -251,9 +384,10 @@
     "/flywheel/jobs/history/search": {
       "get": {
         "tags": [
-          "FlywheelJobs"
+          "Flywheel jobs"
         ],
         "summary": "Returns matching retained job counts by current state and update time, independent of pagination.",
+        "description": "Query is limited to 200 characters. Supply both UTC range bounds or neither, with start before end. Requires search history support.",
         "operationId": "FlywheelJobs_SearchHistory",
         "parameters": [
           {
@@ -281,17 +415,29 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/JobHistoryPoint"
-                  }
-                }
-              },
               "application/json": {
                 "schema": {
                   "type": "array",
@@ -299,15 +445,23 @@
                     "$ref": "#/components/schemas/JobHistoryPoint"
                   }
                 }
-              },
-              "text/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/JobHistoryPoint"
-                  }
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
+            }
+          },
+          "501": {
+            "description": "Not Implemented",
+            "content": {
+              "application/json": { }
             }
           }
         }
@@ -316,29 +470,46 @@
     "/flywheel/jobs/history/options": {
       "get": {
         "tags": [
-          "FlywheelJobs"
+          "Flywheel jobs"
         ],
         "summary": "Returns the configured aggregate activity retention.",
+        "description": "Returns aggregate activity retention in seconds. Requires job history support.",
         "operationId": "FlywheelJobs_HistoryOptions",
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/HistoryOptions"
-                }
-              },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HistoryOptions"
                 }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HistoryOptions"
-                }
               }
+            }
+          },
+          "501": {
+            "description": "Not Implemented",
+            "content": {
+              "application/json": { }
             }
           }
         }
@@ -347,29 +518,46 @@
     "/flywheel/jobs/schedules": {
       "get": {
         "tags": [
-          "FlywheelJobs"
+          "Flywheel jobs"
         ],
         "summary": "Returns the next 200 recurring schedules and pending executions independently of activity search.",
+        "description": "Returns up to 200 recurring schedules and 200 pending executions. Requires schedule query support.",
         "operationId": "FlywheelJobs_Schedules",
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScheduleView"
-                }
-              },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ScheduleView"
                 }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScheduleView"
-                }
               }
+            }
+          },
+          "501": {
+            "description": "Not Implemented",
+            "content": {
+              "application/json": { }
             }
           }
         }
@@ -378,9 +566,10 @@
     "/flywheel/jobs": {
       "get": {
         "tags": [
-          "FlywheelJobs"
+          "Flywheel jobs"
         ],
         "summary": "Returns a page of jobs without payloads or lease tokens.",
+        "description": "Offset must be nonnegative. Count must be from 1 to 200 and defaults to 50. Payloads and lease credentials are excluded.",
         "operationId": "FlywheelJobs_List",
         "parameters": [
           {
@@ -419,17 +608,29 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/JobView"
-                  }
-                }
-              },
               "application/json": {
                 "schema": {
                   "type": "array",
@@ -437,13 +638,15 @@
                     "$ref": "#/components/schemas/JobView"
                   }
                 }
-              },
-              "text/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/JobView"
-                  }
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -454,9 +657,10 @@
     "/flywheel/jobs/search": {
       "get": {
         "tags": [
-          "FlywheelJobs"
+          "Flywheel jobs"
         ],
         "summary": "Searches jobs and returns the page and total match count.",
+        "description": "Query is limited to 200 characters. Offset must be nonnegative; count must be from 1 to 200. Supply both UTC range bounds or neither. Time filtering requires store support. excludedStates is a comma-separated list of job states.",
         "operationId": "FlywheelJobs_Search",
         "parameters": [
           {
@@ -525,24 +729,50 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchResult"
-                }
-              },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SearchResult"
                 }
-              },
-              "text/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
+            }
+          },
+          "501": {
+            "description": "Not Implemented",
+            "content": {
+              "application/json": { }
             }
           }
         }
@@ -551,9 +781,10 @@
     "/flywheel/jobs/{id}/logs": {
       "get": {
         "tags": [
-          "FlywheelJobs"
+          "Flywheel jobs"
         ],
         "summary": "Returns a bounded page of execution logs for an existing job.",
+        "description": "Returns retained logs for an existing job. Count must be from 1 to 200 and defaults to 200.",
         "operationId": "FlywheelJobs_GetLogs",
         "parameters": [
           {
@@ -583,17 +814,29 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LogEntry"
-                  }
-                }
-              },
               "application/json": {
                 "schema": {
                   "type": "array",
@@ -601,13 +844,25 @@
                     "$ref": "#/components/schemas/LogEntry"
                   }
                 }
-              },
-              "text/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LogEntry"
-                  }
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -618,9 +873,10 @@
     "/flywheel/jobs/{id}": {
       "get": {
         "tags": [
-          "FlywheelJobs"
+          "Flywheel jobs"
         ],
         "summary": "Returns a job snapshot without its payload or lease token.",
+        "description": "Returns a retained job without payload or lease credentials. The identifier must be nonblank and at most 200 characters.",
         "operationId": "FlywheelJobs_Get",
         "parameters": [
           {
@@ -633,22 +889,52 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/JobView"
-                }
-              },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/JobView"
                 }
-              },
-              "text/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JobView"
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -659,9 +945,10 @@
     "/flywheel/jobs/{id}/run": {
       "post": {
         "tags": [
-          "FlywheelJobs"
+          "Flywheel jobs"
         ],
         "summary": "Queues a fresh standalone execution from a finished job without changing the original execution or schedule.",
+        "description": "Requires a succeeded, dead-lettered, or cancelled job. Other states return 409; jobs restricted to an application version return 501. Requires an antiforgery token.",
         "operationId": "FlywheelJobs_RunAgain",
         "parameters": [
           {
@@ -683,24 +970,70 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/StartedJob"
-                }
-              },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StartedJob"
                 }
-              },
-              "text/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StartedJob"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Not Implemented",
+            "content": {
+              "application/json": { }
             }
           }
         }
@@ -709,9 +1042,10 @@
     "/flywheel/jobs/{id}/cancel": {
       "post": {
         "tags": [
-          "FlywheelJobs"
+          "Flywheel jobs"
         ],
         "summary": "Requests cancellation of pending or running work.",
+        "description": "Requires an antiforgery token. Returns 409 when cancellation cannot be accepted by the store.",
         "operationId": "FlywheelJobs_Cancel",
         "parameters": [
           {
@@ -733,8 +1067,51 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "204": {
-            "description": "No Content"
+            "description": "No Content",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -742,31 +1119,36 @@
     "/flywheel/servers": {
       "get": {
         "tags": [
-          "FlywheelServers"
+          "Flywheel servers"
         ],
         "summary": "Returns up to 200 servers with unexpired heartbeats.",
+        "description": "Returns at most 200 workers whose heartbeats have not expired, including their public execution snapshots.",
         "operationId": "FlywheelServers_List",
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServerView"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServerView"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -782,9 +1164,10 @@
     "/flywheel/servers/{id}": {
       "get": {
         "tags": [
-          "FlywheelServers"
+          "Flywheel servers"
         ],
         "summary": "Returns one live server and the jobs currently leased to it.",
+        "description": "Returns a live worker and its leased jobs. The identifier must be nonblank and at most 200 characters.",
         "operationId": "FlywheelServers_Get",
         "parameters": [
           {
@@ -797,22 +1180,52 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerView"
-                }
-              },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ServerView"
                 }
-              },
-              "text/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServerView"
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1362,6 +1775,46 @@
         },
         "description": "Credentials submitted to the dashboard sign-in endpoint."
       },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              }
+            ],
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "RecurringScheduleView": {
         "required": [
           "id",
@@ -1618,13 +2071,13 @@
   ],
   "tags": [
     {
-      "name": "FlywheelAuthentication"
+      "name": "Flywheel authentication"
     },
     {
-      "name": "FlywheelJobs"
+      "name": "Flywheel jobs"
     },
     {
-      "name": "FlywheelServers"
+      "name": "Flywheel servers"
     }
   ]
 }
