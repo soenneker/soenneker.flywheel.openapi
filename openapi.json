@@ -1,0 +1,1630 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Flywheel Dashboard API",
+    "description": "Flywheel dashboard HTTP API. Routes use the default /flywheel EnginePath; hosts can configure a different prefix. Obtain a token from /flywheel/csrf before signing in, send it in X-Flywheel-CSRF to /flywheel/login, and retain the cookies. Refresh the CSRF token after signing in and send it in X-Flywheel-CSRF for all POST requests. The SignalR hub is not described by this HTTP specification.",
+    "version": "v1"
+  },
+  "paths": {
+    "/flywheel/user": {
+      "get": {
+        "tags": [
+          "FlywheelAuthentication"
+        ],
+        "summary": "Returns the authenticated dashboard user.",
+        "operationId": "FlywheelAuthentication_GetUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardUser"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardUser"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/csrf": {
+      "get": {
+        "tags": [
+          "FlywheelAuthentication"
+        ],
+        "summary": "Issues an antiforgery token for the current dashboard identity.",
+        "operationId": "FlywheelAuthentication_GetCsrf",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Csrf"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Csrf"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Csrf"
+                }
+              }
+            }
+          }
+        },
+        "security": [ ]
+      }
+    },
+    "/flywheel/login": {
+      "post": {
+        "tags": [
+          "FlywheelAuthentication"
+        ],
+        "summary": "Verifies credentials and issues the secure dashboard cookie.",
+        "operationId": "FlywheelAuthentication_Login",
+        "parameters": [
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [ ]
+      }
+    },
+    "/flywheel/logout": {
+      "post": {
+        "tags": [
+          "FlywheelAuthentication"
+        ],
+        "summary": "Removes the current dashboard authentication cookie.",
+        "operationId": "FlywheelAuthentication_Logout",
+        "parameters": [
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/schedules/{id}/run": {
+      "post": {
+        "tags": [
+          "FlywheelJobs"
+        ],
+        "summary": "Queues an immediate execution without changing the recurring schedule.",
+        "operationId": "FlywheelJobs_RunRecurring",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartedJob"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartedJob"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartedJob"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/history": {
+      "get": {
+        "tags": [
+          "FlywheelJobs"
+        ],
+        "summary": "Returns durable activity across all jobs for a requested UTC range.",
+        "operationId": "FlywheelJobs_History",
+        "parameters": [
+          {
+            "name": "startAt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endAt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobHistoryPoint"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobHistoryPoint"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobHistoryPoint"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/history/search": {
+      "get": {
+        "tags": [
+          "FlywheelJobs"
+        ],
+        "summary": "Returns matching retained job counts by current state and update time, independent of pagination.",
+        "operationId": "FlywheelJobs_SearchHistory",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startAt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endAt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobHistoryPoint"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobHistoryPoint"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobHistoryPoint"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/history/options": {
+      "get": {
+        "tags": [
+          "FlywheelJobs"
+        ],
+        "summary": "Returns the configured aggregate activity retention.",
+        "operationId": "FlywheelJobs_HistoryOptions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryOptions"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryOptions"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryOptions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/schedules": {
+      "get": {
+        "tags": [
+          "FlywheelJobs"
+        ],
+        "summary": "Returns the next 200 recurring schedules and pending executions independently of activity search.",
+        "operationId": "FlywheelJobs_Schedules",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleView"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleView"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs": {
+      "get": {
+        "tags": [
+          "FlywheelJobs"
+        ],
+        "summary": "Returns a page of jobs without payloads or lease tokens.",
+        "operationId": "FlywheelJobs_List",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "format": "int32",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobView"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobView"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/search": {
+      "get": {
+        "tags": [
+          "FlywheelJobs"
+        ],
+        "summary": "Searches jobs and returns the page and total match count.",
+        "operationId": "FlywheelJobs_Search",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "startAt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endAt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "excludedStates",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/{id}/logs": {
+      "get": {
+        "tags": [
+          "FlywheelJobs"
+        ],
+        "summary": "Returns a bounded page of execution logs for an existing job.",
+        "operationId": "FlywheelJobs_GetLogs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "format": "int32",
+              "default": 200
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LogEntry"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LogEntry"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LogEntry"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/{id}": {
+      "get": {
+        "tags": [
+          "FlywheelJobs"
+        ],
+        "summary": "Returns a job snapshot without its payload or lease token.",
+        "operationId": "FlywheelJobs_Get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobView"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobView"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/{id}/run": {
+      "post": {
+        "tags": [
+          "FlywheelJobs"
+        ],
+        "summary": "Queues a fresh standalone execution from a finished job without changing the original execution or schedule.",
+        "operationId": "FlywheelJobs_RunAgain",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartedJob"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartedJob"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartedJob"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/{id}/cancel": {
+      "post": {
+        "tags": [
+          "FlywheelJobs"
+        ],
+        "summary": "Requests cancellation of pending or running work.",
+        "operationId": "FlywheelJobs_Cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/flywheel/servers": {
+      "get": {
+        "tags": [
+          "FlywheelServers"
+        ],
+        "summary": "Returns up to 200 servers with unexpired heartbeats.",
+        "operationId": "FlywheelServers_List",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServerView"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServerView"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServerView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/servers/{id}": {
+      "get": {
+        "tags": [
+          "FlywheelServers"
+        ],
+        "summary": "Returns one live server and the jobs currently leased to it.",
+        "operationId": "FlywheelServers_Get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerView"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerView"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerView"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Csrf": {
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Antiforgery token submitted with authenticated dashboard mutations."
+          }
+        }
+      },
+      "DashboardUser": {
+        "required": [
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          }
+        },
+        "description": "The authenticated dashboard identity."
+      },
+      "HistoryOptions": {
+        "required": [
+          "retentionSeconds"
+        ],
+        "type": "object",
+        "properties": {
+          "retentionSeconds": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "JobHistoryPoint": {
+        "required": [
+          "timestamp",
+          "scheduled",
+          "running",
+          "succeeded",
+          "deadLettered"
+        ],
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int64"
+          },
+          "scheduled": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int32"
+          },
+          "running": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int32"
+          },
+          "succeeded": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int32"
+          },
+          "deadLettered": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int32"
+          },
+          "cancelled": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int32",
+            "default": 0
+          },
+          "waiting": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int32",
+            "default": 0
+          },
+          "queued": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int32",
+            "default": 0
+          },
+          "scheduledCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              }
+            ],
+            "description": "Server-recorded scheduled concurrency for a live bucket, or null when unavailable.",
+            "format": "int64",
+            "nullable": true
+          },
+          "runningCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              }
+            ],
+            "description": "Server-recorded running concurrency for a live bucket, or null when unavailable.",
+            "format": "int64",
+            "nullable": true
+          },
+          "queuedCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              }
+            ],
+            "description": "Server-recorded eligible queue size for a live bucket, or null when unavailable.",
+            "format": "int64",
+            "nullable": true
+          }
+        },
+        "description": "Job state transitions in a UTC bucket; historical buckets span five minutes and live buckets span one second."
+      },
+      "JobView": {
+        "required": [
+          "id",
+          "name",
+          "state",
+          "attempt",
+          "updatedAt",
+          "cancelRequested",
+          "error",
+          "version",
+          "createdAt",
+          "dueAt",
+          "leaseUntil",
+          "owner"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the job or retained entry."
+          },
+          "name": {
+            "type": "string",
+            "description": "Stable job name used for registration and persisted work."
+          },
+          "state": {
+            "type": "string",
+            "description": "Current durable lifecycle state of the job."
+          },
+          "attempt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Execution attempt number.",
+            "format": "int32"
+          },
+          "updatedAt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Last update time in UTC Unix milliseconds.",
+            "format": "int64"
+          },
+          "cancelRequested": {
+            "type": "boolean",
+            "description": "Whether cancellation has been requested for this job."
+          },
+          "error": {
+            "type": "string",
+            "description": "Retained failure details, or null when no error is recorded.",
+            "nullable": true
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Fencing version of the current execution lease.",
+            "format": "int64"
+          },
+          "createdAt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Creation time in UTC Unix milliseconds.",
+            "format": "int64"
+          },
+          "dueAt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Next eligible execution time in UTC Unix milliseconds.",
+            "format": "int64"
+          },
+          "leaseUntil": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Lease expiration time in UTC Unix milliseconds.",
+            "format": "int64"
+          },
+          "owner": {
+            "type": "string",
+            "description": "Node that owns the current lease, if any.",
+            "nullable": true
+          },
+          "parentJobId": {
+            "type": "string",
+            "description": "Previous step in a saved chain, if any.",
+            "nullable": true
+          },
+          "nextJobId": {
+            "type": "string",
+            "description": "Next step in a saved chain, if any.",
+            "nullable": true
+          },
+          "maxAttempts": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              }
+            ],
+            "description": "Maximum execution attempts.",
+            "format": "int32",
+            "nullable": true
+          },
+          "timeoutSeconds": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              }
+            ],
+            "description": "Execution timeout per attempt, in seconds.",
+            "format": "double",
+            "nullable": true
+          },
+          "priority": {
+            "type": "string",
+            "description": "Dispatch priority for eligible work.",
+            "nullable": true
+          },
+          "progress": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              }
+            ],
+            "description": "Latest progress percentage for the current attempt.",
+            "format": "double",
+            "nullable": true
+          },
+          "progressMessage": {
+            "type": "string",
+            "description": "Optional status text accompanying the latest progress report.",
+            "nullable": true
+          },
+          "progressUpdatedAt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Time of the latest progress report in UTC Unix milliseconds.",
+            "format": "int64",
+            "default": 0
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional human-readable description of the job.",
+            "nullable": true
+          },
+          "startedAt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Start of the latest attempt in UTC Unix milliseconds, or zero when unavailable.",
+            "format": "int64",
+            "default": 0
+          },
+          "completedAt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Terminal completion time in UTC Unix milliseconds, or zero when unavailable.",
+            "format": "int64",
+            "default": 0
+          }
+        }
+      },
+      "LogEntry": {
+        "required": [
+          "id",
+          "timestamp",
+          "attempt",
+          "level",
+          "category",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifier of the retained log entry."
+          },
+          "timestamp": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Log timestamp in UTC Unix milliseconds.",
+            "format": "int64"
+          },
+          "attempt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Execution attempt number.",
+            "format": "int32"
+          },
+          "level": {
+            "type": "string",
+            "description": "Severity name of the captured log message."
+          },
+          "category": {
+            "type": "string",
+            "description": "Logger category that emitted the message."
+          },
+          "message": {
+            "type": "string",
+            "description": "Message text."
+          }
+        }
+      },
+      "LoginRequest": {
+        "required": [
+          "username",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "description": "Credentials submitted to the dashboard sign-in endpoint."
+      },
+      "RecurringScheduleView": {
+        "required": [
+          "id",
+          "name",
+          "interval",
+          "dueAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "interval": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int64"
+          },
+          "dueAt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int64"
+          },
+          "cron": {
+            "type": "string",
+            "nullable": true
+          },
+          "timeZoneId": {
+            "type": "string",
+            "default": "UTC"
+          },
+          "includeSeconds": {
+            "type": "boolean",
+            "default": false
+          },
+          "lastExecutionStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastExecutionId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "description": "A recurring schedule with its interval and next due time in milliseconds."
+      },
+      "ScheduleView": {
+        "required": [
+          "recurring",
+          "scheduled"
+        ],
+        "type": "object",
+        "properties": {
+          "recurring": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecurringScheduleView"
+            }
+          },
+          "scheduled": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobView"
+            }
+          }
+        },
+        "description": "Registered recurring schedules and pending executions, ordered by next due time."
+      },
+      "SearchResult": {
+        "required": [
+          "items",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobView"
+            },
+            "description": "Items returned for the requested page."
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Total number of matching items before pagination.",
+            "format": "int32"
+          }
+        }
+      },
+      "ServerView": {
+        "required": [
+          "id",
+          "expiresAt",
+          "workers",
+          "runningJobs"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int64"
+          },
+          "workers": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int32"
+          },
+          "runningJobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobView"
+            }
+          },
+          "workerHistory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerWorkerHistoryPoint"
+            },
+            "description": "Recent worker counts recorded by server heartbeats, ordered oldest first."
+          },
+          "observedAt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Server-side UTC Unix milliseconds at which this snapshot was read.",
+            "format": "int64"
+          }
+        },
+        "description": "A live Flywheel worker server and its currently leased jobs."
+      },
+      "ServerWorkerHistoryPoint": {
+        "required": [
+          "timestamp",
+          "busyWorkers",
+          "expiresAt"
+        ],
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Observation time in UTC Unix milliseconds.",
+            "format": "int64"
+          },
+          "busyWorkers": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Number of jobs with a live lease on the server.",
+            "format": "int32"
+          },
+          "expiresAt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Time after which this observation is no longer considered live.",
+            "format": "int64"
+          }
+        },
+        "description": "A server's busy-worker count observed at a heartbeat."
+      },
+      "StartedJob": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "description": "Identifier of the execution queued by a manual run action."
+      }
+    },
+    "securitySchemes": {
+      "FlywheelCookie": {
+        "type": "apiKey",
+        "name": "__Host-Flywheel",
+        "in": "cookie"
+      }
+    }
+  },
+  "security": [
+    {
+      "FlywheelCookie": [ ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "FlywheelAuthentication"
+    },
+    {
+      "name": "FlywheelJobs"
+    },
+    {
+      "name": "FlywheelServers"
+    }
+  ]
+}
