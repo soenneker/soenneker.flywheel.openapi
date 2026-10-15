@@ -141,6 +141,82 @@
         }
       }
     },
+    "/flywheel/jobs/manual": {
+      "get": {
+        "tags": [
+          "Flywheel jobs"
+        ],
+        "summary": "Lists registered manual definitions without exposing payloads.",
+        "operationId": "FlywheelJobs_ListManual",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ManualJobView"
+                  }
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Not Implemented"
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/manual/{id}/run": {
+      "post": {
+        "tags": [
+          "Flywheel jobs"
+        ],
+        "summary": "Queues a fresh execution of a registered manual job.",
+        "operationId": "FlywheelJobs_RunManual",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartedJob"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "501": {
+            "description": "Not Implemented"
+          }
+        }
+      }
+    },
     "/flywheel/jobs/schedules/{id}/run": {
       "post": {
         "tags": [
@@ -1376,6 +1452,37 @@
         },
         "description": "Credentials submitted to the dashboard sign-in endpoint."
       },
+      "ManualJobView": {
+        "required": [
+          "id",
+          "name",
+          "description",
+          "lastExecutionId",
+          "lastExecutionStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastExecutionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastExecutionStatus": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "description": "A registered manual job and its latest execution, without its payload."
+      },
       "RecurringScheduleView": {
         "required": [
           "id",
@@ -1411,9 +1518,16 @@
               },
               {
                 "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
               }
             ],
-            "format": "int64"
+            "format": "int64",
+            "nullable": true
           },
           "cron": {
             "type": "string",
