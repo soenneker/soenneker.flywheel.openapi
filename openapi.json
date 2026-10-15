@@ -427,7 +427,7 @@
           "Flywheel jobs"
         ],
         "summary": "Returns the next 200 recurring schedules and pending executions independently of activity search.",
-        "description": "Returns up to 200 recurring schedules and 200 pending executions. Requires schedule query support.",
+        "description": "Returns up to 200 recurring schedules and 200 pending executions, plus exact queue and recurring totals when supported by the store. Requires schedule query support.",
         "operationId": "FlywheelJobs_Schedules",
         "responses": {
           "200": {
@@ -767,6 +767,66 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "501": {
+            "description": "Not Implemented"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/{id}/queue/{action}": {
+      "post": {
+        "tags": [
+          "Flywheel jobs"
+        ],
+        "summary": "Atomically changes the queue position or due time of an existing pending execution.",
+        "description": "Actions: top, bottom, run-now. Pool and execution limits still apply. Requires antiforgery protection; stale or ineligible executions return 409.",
+        "operationId": "FlywheelJobs_UpdateQueue",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
           },
           "400": {
             "description": "Bad Request"
@@ -1129,6 +1189,40 @@
         },
         "description": "Job state transitions in a UTC bucket; historical buckets span five minutes and live buckets span one second."
       },
+      "JobQueueCounts": {
+        "required": [
+          "queued",
+          "scheduled"
+        ],
+        "type": "object",
+        "properties": {
+          "queued": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int64"
+          },
+          "scheduled": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int64"
+          }
+        },
+        "description": "Exact pending execution totals at one storage observation time."
+      },
       "JobView": {
         "required": [
           "id",
@@ -1376,6 +1470,11 @@
             "description": "Terminal completion time in UTC Unix milliseconds, or zero when unavailable.",
             "format": "int64",
             "default": 0
+          },
+          "workerPool": {
+            "type": "string",
+            "description": "Pool that claimed the latest attempt, or null when unavailable.",
+            "nullable": true
           }
         }
       },
@@ -1570,6 +1669,39 @@
             "items": {
               "$ref": "#/components/schemas/JobView"
             }
+          },
+          "queueCounts": {
+            "oneOf": [
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              },
+              {
+                "$ref": "#/components/schemas/JobQueueCounts"
+              }
+            ]
+          },
+          "recurringCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              }
+            ],
+            "description": "Total recurring definitions, independently of the returned list.",
+            "format": "int64",
+            "nullable": true
           }
         },
         "description": "Registered recurring schedules and pending executions, ordered by next due time."
@@ -1644,6 +1776,13 @@
             "items": {
               "$ref": "#/components/schemas/JobView"
             }
+          },
+          "pools": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkerPoolCapacity"
+            },
+            "description": "Desired capacity for each worker pool on this server. Empty means legacy default-pool metadata."
           },
           "workerHistory": {
             "type": "array",
@@ -1729,6 +1868,33 @@
           }
         },
         "description": "Identifier of the execution queued by a manual run action."
+      },
+      "WorkerPoolCapacity": {
+        "required": [
+          "name",
+          "workers"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Pool name."
+          },
+          "workers": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Desired concurrent workers, excluding retiring executions.",
+            "format": "int32"
+          }
+        },
+        "description": "Configured worker capacity for one case-sensitive pool on a server."
       }
     },
     "securitySchemes": {
