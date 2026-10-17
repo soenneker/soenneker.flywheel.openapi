@@ -655,6 +655,13 @@
               "format": "int32",
               "default": 200
             }
+          },
+          {
+            "name": "beforeId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
