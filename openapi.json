@@ -1487,6 +1487,42 @@
             "type": "boolean",
             "description": "Whether this job is maintained by the Flywheel runtime.",
             "default": false
+          },
+          "lastOwner": {
+            "type": "string",
+            "description": "Node that claimed the latest attempt, retained after ownership ends.",
+            "nullable": true
+          },
+          "lastLeaseRenewedAt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Latest successful lease renewal in UTC Unix milliseconds, or zero when unavailable.",
+            "format": "int64"
+          },
+          "lastLeaseUntil": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Latest granted lease deadline in UTC Unix milliseconds, retained after ownership ends.",
+            "format": "int64"
+          },
+          "leaseLossReason": {
+            "type": "string",
+            "description": "Observed lease loss reason, or an explicit explanation that the cause is unknown.",
+            "nullable": true
           }
         }
       },
