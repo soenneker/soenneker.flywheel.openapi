@@ -1482,6 +1482,11 @@
             "type": "string",
             "description": "Pool that claimed the latest attempt, or null when unavailable.",
             "nullable": true
+          },
+          "isSystem": {
+            "type": "boolean",
+            "description": "Whether this job is maintained by the Flywheel runtime.",
+            "default": false
           }
         }
       },
@@ -1654,6 +1659,10 @@
           "lastExecutionId": {
             "type": "string",
             "nullable": true
+          },
+          "isSystem": {
+            "type": "boolean",
+            "default": false
           }
         },
         "description": "A recurring schedule with its interval and next due time in milliseconds."
