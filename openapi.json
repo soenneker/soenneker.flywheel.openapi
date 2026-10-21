@@ -141,6 +141,316 @@
         }
       }
     },
+    "/flywheel/jobs/{id}/workflow": {
+      "get": {
+        "tags": [
+          "FlywheelDefinitionEndpoints"
+        ],
+        "operationId": "FlywheelJobs_Workflow",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/schedules/{id}/definition": {
+      "get": {
+        "tags": [
+          "FlywheelDefinitionEndpoints"
+        ],
+        "operationId": "FlywheelJobs_ScheduleDefinition",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleDefinitionView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/schedules/{id}/update": {
+      "post": {
+        "tags": [
+          "FlywheelDefinitionEndpoints"
+        ],
+        "operationId": "FlywheelJobs_UpdateSchedule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/schedules/{id}/enabled/{enabled}": {
+      "post": {
+        "tags": [
+          "FlywheelDefinitionEndpoints"
+        ],
+        "operationId": "FlywheelJobs_EnableSchedule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "enabled",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/schedules/{id}/delete": {
+      "post": {
+        "tags": [
+          "FlywheelDefinitionEndpoints"
+        ],
+        "operationId": "FlywheelJobs_DeleteSchedule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/manual/{id}/definition": {
+      "get": {
+        "tags": [
+          "FlywheelDefinitionEndpoints"
+        ],
+        "operationId": "FlywheelJobs_ManualDefinition",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnqueueRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/manual/{id}/update": {
+      "post": {
+        "tags": [
+          "FlywheelDefinitionEndpoints"
+        ],
+        "operationId": "FlywheelJobs_UpdateManual",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnqueueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/flywheel/jobs/manual/{id}/delete": {
+      "post": {
+        "tags": [
+          "FlywheelDefinitionEndpoints"
+        ],
+        "operationId": "FlywheelJobs_DeleteManual",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Flywheel-CSRF",
+            "in": "header",
+            "description": "Request token from /flywheel/csrf. Retain the antiforgery cookie as well.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/flywheel/jobs/manual": {
       "get": {
         "tags": [
@@ -980,6 +1290,15 @@
   },
   "components": {
     "schemas": {
+      "ContinuationCondition": {
+        "enum": [
+          "OnSuccess",
+          "OnFailure",
+          "OnCancelled",
+          "OnCompleted"
+        ],
+        "description": "The terminal predecessor outcome required to release dependent work."
+      },
       "Csrf": {
         "required": [
           "token"
@@ -1003,6 +1322,44 @@
           }
         },
         "description": "The authenticated dashboard identity."
+      },
+      "EnqueueRequest": {
+        "required": [
+          "name",
+          "payload",
+          "policy",
+          "delay"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Stable job name used for registration and persisted work."
+          },
+          "payload": {
+            "type": "string",
+            "description": "JSON-serialized payload passed to the job handler."
+          },
+          "policy": {
+            "$ref": "#/components/schemas/JobPolicy"
+          },
+          "delay": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string",
+            "description": "Delay before the job becomes eligible to execute."
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Optional key used to deduplicate enqueue requests while the key is retained.",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional human-readable description displayed by dashboard clients.",
+            "nullable": true
+          }
+        },
+        "description": "Immutable request; delays are relative to authoritative storage time."
       },
       "HistoryOptions": {
         "required": [
@@ -1195,6 +1552,64 @@
           }
         },
         "description": "Job state transitions in a UTC bucket; historical buckets span five minutes and live buckets span one second."
+      },
+      "JobPolicy": {
+        "type": "object",
+        "properties": {
+          "partitionKey": {
+            "type": "string",
+            "description": "Optional case-sensitive partition within the job method (for example a tenant ID), up to 200 characters.\n            Keyed jobs are dispatched fairly within equal-priority work for that method and share its per-partition limit.",
+            "nullable": true
+          },
+          "priority": {
+            "$ref": "#/components/schemas/JobPriority"
+          },
+          "maxAttempts": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Maximum execution attempts, including attempts recovered after a lost lease. Defaults to one (no retries).",
+            "format": "int32"
+          },
+          "timeout": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string",
+            "description": "Maximum duration of one execution attempt."
+          },
+          "initialBackoff": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string",
+            "description": "Base delay before retrying the first failed attempt."
+          },
+          "maxBackoff": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string",
+            "description": "Maximum retry delay after exponential backoff and jitter are applied."
+          },
+          "jitter": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Fractional random variation applied to the retry delay, from zero through one.",
+            "format": "double"
+          }
+        },
+        "description": "Persisted execution policy; attempt limits include recovered executions."
+      },
+      "JobPriority": {
+        "description": "Dispatch order among eligible jobs; running jobs are never preempted."
       },
       "JobQueueCounts": {
         "required": [
@@ -1488,6 +1903,11 @@
             "description": "Whether this job is maintained by the Flywheel runtime.",
             "default": false
           },
+          "workflowId": {
+            "type": "string",
+            "description": "Workflow containing this execution, if any.",
+            "nullable": true
+          },
           "lastOwner": {
             "type": "string",
             "description": "Node that claimed the latest attempt, retained after ownership ends.",
@@ -1699,9 +2119,114 @@
           "isSystem": {
             "type": "boolean",
             "default": false
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "revision": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int64",
+            "default": 0
           }
         },
         "description": "A recurring schedule with its interval and next due time in milliseconds."
+      },
+      "ScheduleDefinitionView": {
+        "required": [
+          "id",
+          "definition"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/ScheduleUpdate"
+          }
+        },
+        "description": "An authenticated editor's recurring definition, including its payload and concurrency revision."
+      },
+      "ScheduleUpdate": {
+        "required": [
+          "name",
+          "payload",
+          "policy"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "string"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/JobPolicy"
+          },
+          "intervalMilliseconds": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int64",
+            "default": 0
+          },
+          "cron": {
+            "type": "string",
+            "nullable": true
+          },
+          "timeZoneId": {
+            "type": "string",
+            "default": "UTC"
+          },
+          "includeSeconds": {
+            "type": "boolean",
+            "default": false
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "expectedRevision": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              }
+            ],
+            "format": "int64",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "description": "Replaces a recurring definition. Exactly one of IntervalMilliseconds or Cron must be supplied.\n            ExpectedRevision optionally rejects a stale editor. Paused definitions remain paused unless Enabled is changed."
       },
       "ScheduleView": {
         "required": [
@@ -1947,6 +2472,115 @@
           }
         },
         "description": "Configured worker capacity for one case-sensitive pool on a server."
+      },
+      "WorkflowStepView": {
+        "required": [
+          "id",
+          "name",
+          "state",
+          "predecessorIds",
+          "condition",
+          "skipped",
+          "progress",
+          "error"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "predecessorIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "condition": {
+            "$ref": "#/components/schemas/ContinuationCondition"
+          },
+          "skipped": {
+            "type": "boolean"
+          },
+          "progress": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              }
+            ],
+            "format": "double",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "description": "A workflow execution without payloads or lease credentials."
+      },
+      "WorkflowView": {
+        "required": [
+          "id",
+          "state",
+          "completed",
+          "total",
+          "steps"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "completed": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int32"
+          },
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int32"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkflowStepView"
+            }
+          }
+        },
+        "description": "A retained workflow with aggregate status and its dependency graph."
       }
     },
     "securitySchemes": {
@@ -1965,6 +2599,9 @@
   "tags": [
     {
       "name": "Flywheel authentication"
+    },
+    {
+      "name": "FlywheelDefinitionEndpoints"
     },
     {
       "name": "Flywheel jobs"
