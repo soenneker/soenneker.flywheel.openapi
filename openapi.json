@@ -1574,7 +1574,20 @@
                 "type": "string"
               }
             ],
-            "description": "Maximum execution attempts, including attempts recovered after a lost lease. Defaults to one (no retries).",
+            "description": "Maximum failed handler attempts before dead-lettering. Stale recovery and graceful interruption do not consume this budget. Defaults to one (no failure retries).",
+            "format": "int32"
+          },
+          "maxStaleRestarts": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Maximum automatic restarts after lease expiry, independently of MaxAttempts. Zero disables stale restarts.\n            Recovery can repeat external side effects; handlers must be idempotent.",
             "format": "int32"
           },
           "timeout": {
@@ -1606,7 +1619,7 @@
             "format": "double"
           }
         },
-        "description": "Persisted execution policy; attempt limits include recovered executions."
+        "description": "Persisted execution policy. Handler failures and stale recoveries have independent budgets."
       },
       "JobPriority": {
         "description": "Dispatch order among eligible jobs; running jobs are never preempted."
@@ -1903,6 +1916,65 @@
             "description": "Whether this job is maintained by the Flywheel runtime.",
             "default": false
           },
+          "failureCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Completed handler failures charged to MaxAttempts.",
+            "format": "int32"
+          },
+          "staleRestartCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Automatic stale restarts granted to this job.",
+            "format": "int32"
+          },
+          "maxStaleRestarts": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Maximum automatic stale restarts, independent of the handler failure budget.",
+            "format": "int32"
+          },
+          "scheduledFor": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  null
+                ],
+                "nullable": true
+              }
+            ],
+            "description": "Original recurring occurrence time in UTC Unix milliseconds, if applicable.",
+            "format": "int64",
+            "nullable": true
+          },
           "workflowId": {
             "type": "string",
             "description": "Workflow containing this execution, if any.",
@@ -2136,6 +2208,23 @@
             ],
             "format": "int64",
             "default": 0
+          },
+          "coalesceOccurrences": {
+            "type": "boolean",
+            "default": false
+          },
+          "coalescedOccurrences": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "format": "int64",
+            "default": 0
           }
         },
         "description": "A recurring schedule with its interval and next due time in milliseconds."
@@ -2224,9 +2313,13 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "coalesceOccurrences": {
+            "type": "boolean",
+            "default": false
           }
         },
-        "description": "Replaces a recurring definition. Exactly one of IntervalMilliseconds or Cron must be supplied.\n            ExpectedRevision optionally rejects a stale editor. Paused definitions remain paused unless Enabled is changed."
+        "description": "Replaces a recurring definition. Exactly one of IntervalMilliseconds or Cron must be supplied.\n            ExpectedRevision optionally rejects a stale editor. Paused definitions remain paused unless Enabled is changed.\n            CoalesceOccurrences allows only one unfinished execution per schedule across all hosts, including manual runs and retries."
       },
       "ScheduleView": {
         "required": [
