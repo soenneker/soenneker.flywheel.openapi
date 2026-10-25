@@ -838,7 +838,7 @@
           "Flywheel jobs"
         ],
         "summary": "Searches jobs and returns the page and total match count.",
-        "description": "Query is limited to 200 characters. Offset must be nonnegative; count must be from 1 to 200. Supply both UTC range bounds or neither. Time filtering requires store support. excludedStates is a comma-separated list of job states.",
+        "description": "Query is limited to 200 characters. Offset must be from 0 to 10000; count must be from 1 to 200. Supply both UTC range bounds or neither. Time filtering requires store support. excludedStates is a comma-separated list of job states.",
         "operationId": "FlywheelJobs_Search",
         "parameters": [
           {
